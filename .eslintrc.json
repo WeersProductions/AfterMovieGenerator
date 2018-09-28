@@ -8,6 +8,12 @@
   "rules": {
     "no-console": "off",
     "comma-dangle": "off",
-    "react/jsx-filename-extension": "off"
+    "react/jsx-filename-extension": "off",
+    "no-continue": "off",
+    "no-underscore-dangle": "off",
+    "no-use-before-define": "off",
+    "no-unused-vars": "off",
+    "no-plusplus": "off",
+    "no-param-reassign": "off"
   }
 }
