@@ -3,8 +3,8 @@ import './app.css';
 import styled, { css } from 'react-emotion';
 import { Column, Row } from 'simple-flexbox';
 import DropZone from 'react-dropzone';
-import MusicPlayer from 'react-responsive-music-player';
 import ReactPlayer from 'react-player';
+import MusicPlayer from './MusicPlayer';
 
 const Input = styled('input')`
   padding: 0.5em;
@@ -75,9 +75,8 @@ export default class App extends Component {
   state = {
     waveform: null,
     songId: '',
-    images: null,
-    music: null,
-    videoResult: null
+    videoResult: null,
+    files: []
   };
 
   componentDidMount() {
@@ -102,104 +101,108 @@ export default class App extends Component {
     this.setState({ waveform: `/api/waveform/${songId}.png` });
   };
 
-  onDropMovieFiles = (acceptedFiles, rejectedFiles) => {
-    console.log(`Uploading ${acceptedFiles.length} video files`);
-    this.setState({
-      images: acceptedFiles
-    });
+  getMovie = () => {
+    console.log('Movie!');
   };
 
-  onDropAudioFiles = (acceptedFiles, rejectedFiles) => {
-    console.log(`Uploading ${acceptedFiles.length} audio files`);
-    console.log(acceptedFiles);
+  onDropFiles = (acceptedFiles, rejectedFiles) => {
+    console.log(`Uploading ${acceptedFiles.length} files`);
+    const newFiles = [];
+    for (let i = 0; i < acceptedFiles.length; i++) {
+      newFiles.push({
+        type: acceptedFiles[i].type,
+        url: acceptedFiles[i].preview,
+        name: acceptedFiles[i].name,
+        title: acceptedFiles[i].name,
+        artist: ['unknown'],
+        id: null
+      });
+    }
+
+    const { files } = this.state;
+
     this.setState({
-      music: acceptedFiles
+      files: [...files, ...newFiles]
     });
   };
 
   render() {
     const {
-      waveform, songId, images, videoResult
+      waveform, songId, videoResult, files
     } = this.state;
-    let { music } = this.state;
-    const imagesDrawn = [];
-    if (images) {
-      for (let i = 0; i < images.length; i++) {
-        console.log(images[i].preview);
-        imagesDrawn.push(
-          <div key={i}>
-            <Thumbnail src={images[i].preview} alt={images[i].name} />
-          </div>
-        );
+    const filesDrawn = [];
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].type.includes('image')) {
+          filesDrawn.push(
+            <div key={i}>
+              <Thumbnail src={files[i].url} alt={files[i].name} />
+            </div>
+          );
+        }
+        if (files[i].type.includes('audio')) {
+          filesDrawn.push(
+            <div key={i}>
+              <MusicPlayer src={files[i].url} />
+            </div>
+          );
+        }
       }
-    }
-    if (music && !music.url) {
-      music = { url: music[0].preview, artist: ['unknown'], title: music[0].name };
     }
 
     return (
       <div>
         <Column flexGrow={1}>
-          <Row>{videoResult ? <ReactPlayer url={videoResult.preview} playing /> : <div />}</Row>
+          <Row horizontal="center">Title bar</Row>
           <Row>
             <Column flexGrow={1}>
-              <DropZoneOwn
-                onDrop={this.onDropAudioFiles}
-                accept="audio/*"
-                activeClassName="active"
-                acceptClassName="accept"
-                disabledClassName="disabled"
-                rejectClassName="reject"
-                multiple={false}
-                disableClick={music}
-              >
+              <Row>
                 <Column flexGrow={1}>
-                  <Row horizontal="center">Drop audio</Row>
-                  {music ? <MusicPlayer playlist={[music]} /> : <div />}
+                  <DropZoneOwn
+                    onDrop={this.onDropFiles}
+                    accept="image/*, audio/*"
+                    activeClassName="active"
+                    acceptClassName="accept"
+                    disabledClassName="disabled"
+                    rejectClassName="reject"
+                    multiple={false}
+                    disableClick={false}
+                  >
+                    <Column flexGrow={1}>
+                      <Row horizontal="center">Drop audio/images</Row>
+                      {filesDrawn}
+                    </Column>
+                  </DropZoneOwn>
                 </Column>
-              </DropZoneOwn>
-            </Column>
 
-            <Column flexGrow={1}>
-              <Button primary onClick={this.getWaveForm}>
-                Upload music
-              </Button>
-            </Column>
-          </Row>
-          <Row horizontal="center">
-            {waveform ? <Waveform src={waveform} alt="waveform" /> : <div />}
-          </Row>
-          <Row vertical="center">
-            <Column flexGrow={1}>
-              <Input defaultValue="songId" onChange={this.setSongId} />
-            </Column>
-            <Column flexGrow={1}>
-              <Button primary onClick={this.getWaveForm}>
-                Get waveform
-              </Button>
-            </Column>
-          </Row>
-          <Row>
-            <Column flexGrow={1}>
-              <DropZoneOwn
-                onDrop={this.onDropMovieFiles}
-                accept="image/*"
-                activeClassName="active"
-                acceptClassName="accept"
-                disabledClassName="disabled"
-                rejectClassName="reject"
-              >
                 <Column flexGrow={1}>
-                  <Row horizontal="center">Drop images</Row>
-                  {imagesDrawn}
+                  <Button primary onClick={this.getWaveForm}>
+                    Upload music
+                  </Button>
                 </Column>
-              </DropZoneOwn>
-            </Column>
+              </Row>
 
-            <Column flexGrow={1}>
-              <Button primary onClick={this.getWaveForm}>
-                Get movie
-              </Button>
+              <Row vertical="center">
+                <Column flexGrow={1}>
+                  <Input defaultValue="songId" onChange={this.setSongId} />
+                </Column>
+                <Column flexGrow={1}>
+                  <Button primary onClick={this.getWaveForm}>
+                    Get waveform
+                  </Button>
+                </Column>
+              </Row>
+              <Row>
+                <Column flexGrow={1}>
+                  <Button primary onClick={this.getMovie}>
+                    Get movie
+                  </Button>
+                </Column>
+              </Row>
+            </Column>
+            <Column flexGrow={1} vertical="center">
+              {videoResult ? <ReactPlayer url={videoResult.preview} playing /> : <div />}
+              {waveform ? <Waveform src={waveform} alt="waveform" /> : <div />}
             </Column>
           </Row>
         </Column>
