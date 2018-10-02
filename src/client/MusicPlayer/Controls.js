@@ -1,9 +1,10 @@
 import * as React from 'react';
 import styled from 'react-emotion';
+import {MdPlayArrow, MdPause} from 'react-icons/md';
 
 const Controls = styled('div') `
   position: absolute;
-  bottom: 8%;
+  bottom: 32px;
   pointer-events: none;
   margin: auto;
   left: 0;
@@ -27,7 +28,10 @@ const Button = styled('i')`
   opacity: 0.5;
   font-size: 24px;
 
-   ${props => (props.play ? 'margin-left: 5px' : '')};
+  &:active {
+    transform: scale(0.98);
+    background: #FFFFFF;
+  }
 `;
 
 export default class Scrubber extends React.Component {
@@ -38,11 +42,17 @@ export default class Scrubber extends React.Component {
   render() {
     const {isPlaying, onClick } = this.props;
 
+{/* <div onClick={onClick} onKeyDown={onClick} tabIndex={0} role="button" className="Button">
+          <Button play = {isPlaying === 'pause'}/>
+        </div> */}
+    
+//<i className='fa fa-fw fa-pause'></i>
+
     return (
       <Controls>
-        <div onClick={onClick} onKeyDown={onClick} tabIndex={0} role="button" className="Button">
-          <Button play = {isPlaying === 'pause'}/>
-        </div>
+        <Button onClick={onClick} onKeyDown={onClick} tabIndex={0} role="button">
+          {isPlaying === 'pause' ? <MdPause/> : <MdPlayArrow/>}
+        </Button>
       </Controls>
     );
   }

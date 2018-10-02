@@ -3,7 +3,7 @@ import TrackInformation from './TrackInformation';
 import Scrubber from './Scrubber';
 import Controls from './Controls';
 import Timestamps from './Timestamps';
-import './MusicPlayer.css';
+// import './MusicPlayer.css';
 import styled from 'react-emotion';
 import mediaTags from '../jsmediatags.min';
 
@@ -13,8 +13,8 @@ const Background = styled('div')`
   position: absolute;
   top: -25%;
   left: -25%;
-  backgroundSize: cover;
-  backgroundPosition: center center;
+  background-size: cover;
+  background-position: center center;
   opacity: 0.2;
   filter: blur(10px);
   background-image: '${props => props.backgroundImage}';
@@ -46,6 +46,15 @@ const Artwork = styled('div')`
   box-shadow: 0 5px 10px -5px rgba(18, 18, 18, 0.25);
   position: relative;
   background-image: ${props => props.backgroundImage};
+`;
+
+const Title = styled(`div`)`
+  width: 300px;
+  margin: 50px auto;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  position: relative;
 `;
 
 const httpToStream = (url) => {
@@ -101,15 +110,18 @@ export default class MusicPlayer extends React.Component {
   };
 
   togglePlay = () => {
-    console.log(this.props);
     let { playStatus } = this.state;
     const audio = document.getElementById('audio');
     if (playStatus === 'play') {
       playStatus = 'pause';
       audio.play();
+      audio.volume = 1;
       const that = this;
       setInterval(() => {
         const { currentTime } = audio;
+        if(!that.props.track.duration) {
+          that.props.track.duration = audio.duration;
+        }
         const { duration } = that.props.track;
         
         // Calculatge percent of song
@@ -119,7 +131,26 @@ export default class MusicPlayer extends React.Component {
       }, 100);
     } else {
       playStatus = 'play';
-      audio.pause();
+      let fadeAudio = setInterval(() => {
+        if(playStatus === 'play') {
+          if(audio.volume > 0.0) {
+            if(audio.volume < 0.30) {
+              audio.volume = 0;
+            } else {
+              audio.volume -= 0.25;
+            }
+            
+            console.log(audio.volume);
+          } else {
+            audio.pause();
+            clearInterval(fadeAudio);
+          }
+        } else {
+          audio.pause();
+          clearInterval(fadeAudio);
+        }
+      }, 200);
+      
     }
     this.setState({ playStatus });
   };
@@ -132,7 +163,7 @@ export default class MusicPlayer extends React.Component {
       <Player>
         <Background backgroundImage= {`url(${picture})`} />
         <Header>
-          <div className="Title">Now playing</div>
+          <Title>Now playing</Title>
         </Header>
         <Artwork backgroundImage= {`url(${picture})`} />
         <TrackInformation track={this.props.track} />

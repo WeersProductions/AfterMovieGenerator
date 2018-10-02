@@ -1,8 +1,13 @@
-h1 {
-  color: green;
-}
+@import 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700';
 
 body {
   text-align: center;
   margin: auto;
+  align-items: center;
+  background: #0c1318;
+  font-family: "Roboto", sans-serif;
+  color: white;
+  height: 100vh;
+  justify-content: center;
 }
+
