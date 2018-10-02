@@ -3,7 +3,6 @@ import * as React from 'react';
 export default class Timestamps extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props);
   }
 
   convertTime = (timestamp) => {
@@ -18,10 +17,12 @@ export default class Timestamps extends React.Component {
   };
 
   render() {
+    const {currentTime, duration} = this.props;
     return (
-      <div className="Scrubber">
-        <div className="Scrubber-Progress" />
-      </div>
-    );
+			<div className="Timestamps">
+				<div className="Time Time--current">{this.convertTime(currentTime)}</div>
+				<div className="Time Time--total">{this.convertTime(duration)}</div>
+			</div>
+		);
   }
 }

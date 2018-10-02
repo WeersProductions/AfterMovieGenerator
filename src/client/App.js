@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import './app.css';
-import styled, { css } from 'react-emotion';
+import styled from 'react-emotion';
 import { Column, Row } from 'simple-flexbox';
 import DropZone from 'react-dropzone';
 import ReactPlayer from 'react-player';
-import MusicPlayer from './MusicPlayer';
+import MusicPlayer from './MusicPlayer/MusicPlayer';
 
 const Input = styled('input')`
   padding: 0.5em;
@@ -106,6 +106,7 @@ export default class App extends Component {
   };
 
   onDropFiles = (acceptedFiles, rejectedFiles) => {
+    console.log(acceptedFiles);
     console.log(`Uploading ${acceptedFiles.length} files`);
     const newFiles = [];
     for (let i = 0; i < acceptedFiles.length; i++) {
@@ -113,9 +114,9 @@ export default class App extends Component {
         type: acceptedFiles[i].type,
         url: acceptedFiles[i].preview,
         name: acceptedFiles[i].name,
-        title: acceptedFiles[i].name,
-        artist: ['unknown'],
-        id: null
+        artist: 'unknown',
+        id: null,
+        file: acceptedFiles[i]
       });
     }
 
@@ -143,7 +144,7 @@ export default class App extends Component {
         if (files[i].type.includes('audio')) {
           filesDrawn.push(
             <div key={i}>
-              <MusicPlayer src={files[i].url} />
+              <MusicPlayer track={files[i]} />
             </div>
           );
         }
@@ -166,7 +167,7 @@ export default class App extends Component {
                     disabledClassName="disabled"
                     rejectClassName="reject"
                     multiple={false}
-                    disableClick={false}
+                    disableClick={true}
                   >
                     <Column flexGrow={1}>
                       <Row horizontal="center">Drop audio/images</Row>
