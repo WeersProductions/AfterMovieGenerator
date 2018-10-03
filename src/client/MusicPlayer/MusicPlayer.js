@@ -155,8 +155,6 @@ export default class MusicPlayer extends React.Component {
     this.setState({ isPlaying });
   };
 
-
-
   render() {
     const {track} = this.props;
     const {picture, duration, url} = track;

@@ -55,9 +55,9 @@ const DropZoneOwn = styled(DropZone)`
   };
 
   &.rejected {
-    borderStyle: 'solid';
-    borderColor: '#c66';
-    backgroundColor: '#eee;
+    border-style: 'solid';
+    border-color: '#c66';
+    background-color: '#eee;
   };
 
   &.disabled {
@@ -65,9 +65,9 @@ const DropZoneOwn = styled(DropZone)`
   };
 
   &.active {
-    borderStyle: 'solid';
-    borderColor: '#6c6';
-    backgroundColor: '#eee';
+    border-style: 'solid';
+    border-color: '#6c6';
+    background-color: '#eee';
   };
 `;
 

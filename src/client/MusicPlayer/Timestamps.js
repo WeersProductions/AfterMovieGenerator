@@ -1,5 +1,5 @@
 import * as React from 'react';
-import styled from 'react-emotion';
+import styled, { keyframes } from 'react-emotion';
 
 const TimeStampsContainer = styled('div') `
   display: flex;
@@ -14,8 +14,19 @@ const TimeStampsContainer = styled('div') `
   width: 100%;
 `;
 
+const FadeIn = keyframes`
+  from {
+    color: transparent;
+  }
+
+  to {
+    color: white;
+  }
+`;
+
 const TimeIndicator = styled('div') `
- font-size: 12px;
+  font-size: 12px;
+  animation: ${FadeIn} 0.3s ease;
 `;
 
 
@@ -37,10 +48,11 @@ export default class Timestamps extends React.Component {
 
   render() {
     const {currentTime, duration} = this.props;
+    console.log(duration);
     return (
 			<TimeStampsContainer>
 				<TimeIndicator>{this.convertTime(currentTime)}</TimeIndicator>
-				<TimeIndicator>{this.convertTime(duration)}</TimeIndicator>
+				{duration ? <TimeIndicator Fade={true}>{this.convertTime(duration)}</TimeIndicator> : <div/>}
 			</TimeStampsContainer>
 		);
   }
