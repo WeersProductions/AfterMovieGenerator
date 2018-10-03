@@ -88,7 +88,7 @@ export default class MusicPlayer extends React.Component {
     });
     
     this.state = { 
-      playStatus: 'play',
+      isPlaying: false,
       currentTime: 0,
       ...props };
   }
@@ -109,11 +109,25 @@ export default class MusicPlayer extends React.Component {
     innerScrubber.style.width = percent;
   };
 
+  fadeAudioOut = (audioControl, interval) => {
+    if(audioControl.volume > 0.0) {
+      if(audioControl.volume < 0.30) {
+        audioControl.volume = 0;
+      } else {
+        audioControl.volume -= 0.25;
+      }
+      return false;
+    } else {
+      audioControl.pause();
+      return true;
+    }
+  }
+
   togglePlay = () => {
-    let { playStatus } = this.state;
+    let { isPlaying } = this.state;
     const audio = document.getElementById('audio');
-    if (playStatus === 'play') {
-      playStatus = 'pause';
+    if (!isPlaying) {
+      isPlaying = true;
       audio.play();
       audio.volume = 1;
       const that = this;
@@ -130,35 +144,23 @@ export default class MusicPlayer extends React.Component {
         that.updateTime(currentTime);
       }, 100);
     } else {
-      playStatus = 'play';
+      isPlaying = false;
       let fadeAudio = setInterval(() => {
-        if(playStatus === 'play') {
-          if(audio.volume > 0.0) {
-            if(audio.volume < 0.30) {
-              audio.volume = 0;
-            } else {
-              audio.volume -= 0.25;
-            }
-            
-            console.log(audio.volume);
-          } else {
-            audio.pause();
-            clearInterval(fadeAudio);
-          }
-        } else {
-          audio.pause();
+        if(this.state.isPlaying || this.fadeAudioOut(audio, fadeAudio)) {
           clearInterval(fadeAudio);
         }
       }, 200);
-      
     }
-    this.setState({ playStatus });
+    console.log(isPlaying);
+    this.setState({ isPlaying });
   };
+
+
 
   render() {
     const {track} = this.props;
     const {picture, duration, url} = track;
-    const {playStatus, currentTime} = this.state;
+    const {isPlaying, currentTime} = this.state;
     return (
       <Player>
         <Background backgroundImage= {`url(${picture})`} />
@@ -168,7 +170,7 @@ export default class MusicPlayer extends React.Component {
         <Artwork backgroundImage= {`url(${picture})`} />
         <TrackInformation track={this.props.track} />
         <Scrubber />
-        <Controls isPlaying={playStatus} onClick={this.togglePlay} />
+        <Controls isPlaying={isPlaying} onClick={this.togglePlay} />
         <Timestamps duration={duration} currentTime={currentTime} />
         <audio id="audio">
           <source src={url} ref={(element) => this.audio = element}/>

@@ -47,11 +47,10 @@ export default class Scrubber extends React.Component {
         </div> */}
     
 //<i className='fa fa-fw fa-pause'></i>
-
     return (
       <Controls>
         <Button onClick={onClick} onKeyDown={onClick} tabIndex={0} role="button">
-          {isPlaying === 'pause' ? <MdPause/> : <MdPlayArrow/>}
+          {isPlaying ? <MdPause/> : <MdPlayArrow/>}
         </Button>
       </Controls>
     );
