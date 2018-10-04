@@ -4,7 +4,8 @@ import styled from 'react-emotion';
 import { Column, Row } from 'simple-flexbox';
 import DropZone from 'react-dropzone';
 import ReactPlayer from 'react-player';
-import MusicPlayer from './MusicPlayer/MusicPlayer';
+
+import FileGrid from './FileGrid';
 
 const Input = styled('input')`
   padding: 0.5em;
@@ -25,14 +26,6 @@ const Button = styled('button')`
   padding: 0.25em 1em;
   border: 2px solid palevioletred;
   border-radius: 3px;
-`;
-
-const Thumbnail = styled('img')`
-  width: 50%;
-  height: auto;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
 `;
 
 const Waveform = styled('img')`
@@ -57,7 +50,7 @@ const DropZoneOwn = styled(DropZone)`
   &.rejected {
     border-style: 'solid';
     border-color: '#c66';
-    background-color: '#eee;
+    background-color: '#eee';
   };
 
   &.disabled {
@@ -131,26 +124,9 @@ export default class App extends Component {
     const {
       waveform, songId, videoResult, files
     } = this.state;
-    const filesDrawn = [];
-    if (files) {
-      for (let i = 0; i < files.length; i++) {
-        if (files[i].type.includes('image')) {
-          filesDrawn.push(
-            <div key={i}>
-              <Thumbnail src={files[i].url} alt={files[i].name} />
-            </div>
-          );
-        }
-        if (files[i].type.includes('audio')) {
-          filesDrawn.push(
-            <div key={i}>
-              <MusicPlayer track={files[i]} />
-            </div>
-          );
-        }
-      }
-    }
-
+    
+    
+    // {filesDrawn}
     return (
       <div>
         <Column flexGrow={1}>
@@ -166,12 +142,13 @@ export default class App extends Component {
                     acceptClassName="accept"
                     disabledClassName="disabled"
                     rejectClassName="reject"
-                    multiple={false}
+                    multiple={true}
                     disableClick={true}
                   >
                     <Column flexGrow={1}>
                       <Row horizontal="center">Drop audio/images</Row>
-                      {filesDrawn}
+                      
+                      <FileGrid files={files}/>
                     </Column>
                   </DropZoneOwn>
                 </Column>

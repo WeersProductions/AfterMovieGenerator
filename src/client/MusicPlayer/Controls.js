@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'react-emotion';
-import {MdPlayArrow, MdPause} from 'react-icons/md';
+import {MdPlayArrow, MdPause} from 'react-icons/md/';
 
 const Controls = styled('div') `
   position: absolute;
@@ -42,11 +42,6 @@ export default class Scrubber extends React.Component {
   render() {
     const {isPlaying, onClick } = this.props;
 
-{/* <div onClick={onClick} onKeyDown={onClick} tabIndex={0} role="button" className="Button">
-          <Button play = {isPlaying === 'pause'}/>
-        </div> */}
-    
-//<i className='fa fa-fw fa-pause'></i>
     return (
       <Controls>
         <Button onClick={onClick} onKeyDown={onClick} tabIndex={0} role="button">
@@ -55,4 +50,4 @@ export default class Scrubber extends React.Component {
       </Controls>
     );
   }
-}
+};

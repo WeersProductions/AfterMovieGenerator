@@ -31,14 +31,16 @@ const Player = styled('div')`
   border-radius: 5px;
   overflow: hidden;
   box-shadow: 0 5px 10px -5px #121212;
-  height: 667px;
+
   position: relative;
-  width: 375px;
 `;
 
+//height: 667px;
+//width: 375px;
+
 const Artwork = styled('div')`
-  width: 300px;
-  height: 300px;
+  max-width: 300px;
+  max-height: 300px;
   background-size: cover;
   background-position: center center;
   border-radius: 4px;
@@ -49,8 +51,8 @@ const Artwork = styled('div')`
 `;
 
 const Title = styled(`div`)`
-  width: 300px;
-  margin: 50px auto;
+  width: 80%;
+  margin: 20% auto;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -93,11 +95,6 @@ export default class MusicPlayer extends React.Component {
       ...props };
   }
 
-  componentDidMount() {
-    this.setState({track : {...this.state.track, duration: this.audio.duration}});
-    console.log(this.audio.duration);
-  };
-
   updateTime = (timestamp) => {
     timestamp = Math.floor(timestamp);
     this.setState({ currentTime: timestamp });
@@ -138,7 +135,7 @@ export default class MusicPlayer extends React.Component {
         }
         const { duration } = that.props.track;
         
-        // Calculatge percent of song
+        // Calculate percent of song
         const percent = `${(currentTime / duration) * 100}%`;
         that.updateScrubber(percent);
         that.updateTime(currentTime);
@@ -151,7 +148,6 @@ export default class MusicPlayer extends React.Component {
         }
       }, 200);
     }
-    console.log(isPlaying);
     this.setState({ isPlaying });
   };
 

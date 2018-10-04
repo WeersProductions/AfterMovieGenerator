@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'react-emotion';
 
 const TrackInformationContainer = styled('div') `
-  width: 300px;
+  width: 80%;
   margin: auto;
   text-align: center;
   position: relative;

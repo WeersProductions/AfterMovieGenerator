@@ -48,7 +48,6 @@ export default class Timestamps extends React.Component {
 
   render() {
     const {currentTime, duration} = this.props;
-    console.log(duration);
     return (
 			<TimeStampsContainer>
 				<TimeIndicator>{this.convertTime(currentTime)}</TimeIndicator>
