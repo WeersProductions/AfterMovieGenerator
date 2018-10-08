@@ -53,23 +53,18 @@ const Background = styled('div')`
   background-image: '${props => props.backgroundImage}';
 `;
 
-export default class ThumbnailAudio extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+const ThumbnailAudio = (props) => {
+  const { file } = props;
+  return (
+    <Container>
+      <Content>
+        <Artwork backgroundImage={`url(${file.picture})`} />
+        <Background backgroundImage={`url(${file.picture})`} />
+        <TrackInformation track={file} />
+      </Content>
+      <Title>{file.name}</Title>
+    </Container>
+  );
+};
 
-  render() {
-    const { file } = this.props;
-    //<MusicPlayer track={file}/>
-    return (
-      <Container>
-        <Content>
-          <Artwork backgroundImage= {`url(${file.picture})`} />
-          <Background backgroundImage= {`url(${file.picture})`} />
-          <TrackInformation track={file}/>
-        </Content>
-        <Title>{file.name}</Title>
-      </Container>
-    );
-  }
-}
+export default ThumbnailAudio;

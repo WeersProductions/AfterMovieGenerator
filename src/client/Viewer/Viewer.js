@@ -2,20 +2,17 @@ import * as React from 'react';
 import styled from 'react-emotion';
 import MusicPlayer from '../MusicPlayer/MusicPlayer';
 
-export default class FileGrid extends React.Component {
-  constructor(props) {
-    super(props);
+const FileGrid = (props) => {
+  const { file, multiple } = props;
+
+  let fileDrawn = null;
+  if (multiple) {
+    fileDrawn = 'Multiple selected';
   }
 
-  render() {
-    const {file} = this.props;
+  fileDrawn = <MusicPlayer track={file} />;
 
-    let fileDrawn = (<MusicPlayer track={file}/>)
+  return <div>{file ? fileDrawn : null}</div>;
+};
 
-    return (
-      <div>
-          {file ? fileDrawn : null}
-      </div>
-    );
-  }
-}
+export default FileGrid;

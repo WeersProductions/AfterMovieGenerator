@@ -46,23 +46,23 @@ const DropZoneOwn = styled(DropZone)`
     border-color: #666;
     border-style: dashed;
     border-radius: 5px;
-  };
+  }
 
   &.rejected {
     border-style: 'solid';
     border-color: '#c66';
     background-color: '#eee';
-  };
+  }
 
   &.disabled {
     opacity: 0.5;
-  };
+  }
 
   &.active {
     border-style: 'solid';
     border-color: '#6c6';
     background-color: '#eee';
-  };
+  }
 `;
 
 export default class App extends Component {
@@ -111,7 +111,8 @@ export default class App extends Component {
         name: acceptedFiles[i].name,
         artist: 'unknown',
         id: null,
-        file: acceptedFiles[i]
+        file: acceptedFiles[i],
+        offline: true
       });
     }
 
@@ -120,15 +121,14 @@ export default class App extends Component {
     this.setState({
       files: [...files, ...newFiles]
     });
-    this.setState({currentSelected: files[0]});
+    this.setState({ currentSelected: files[0] });
   };
 
   render() {
     const {
       waveform, songId, videoResult, files, currentSelected
     } = this.state;
-    
-    
+
     // {filesDrawn}
     return (
       <div>
@@ -145,12 +145,12 @@ export default class App extends Component {
                     acceptClassName="accept"
                     disabledClassName="disabled"
                     rejectClassName="reject"
-                    multiple={true}
-                    disableClick={true}
+                    multiple
+                    disableClick
                   >
                     <Column flexGrow={1}>
                       <Row horizontal="center">Drop audio/images</Row>
-                      <FileGrid files={files}/>
+                      <FileGrid files={files} />
                     </Column>
                   </DropZoneOwn>
                 </Column>
@@ -159,7 +159,7 @@ export default class App extends Component {
                   <Button primary onClick={this.getWaveForm}>
                     Upload music
                   </Button>
-                  <Viewer file={currentSelected}/>
+                  <Viewer file={currentSelected} />
                 </Column>
               </Row>
 

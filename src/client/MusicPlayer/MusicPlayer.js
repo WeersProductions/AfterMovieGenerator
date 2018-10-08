@@ -1,10 +1,9 @@
 import * as React from 'react';
+import styled from 'react-emotion';
 import TrackInformation from './TrackInformation';
 import Scrubber from './Scrubber';
 import Controls from './Controls';
 import Timestamps from './Timestamps';
-// import './MusicPlayer.css';
-import styled from 'react-emotion';
 import mediaTags from '../jsmediatags.min';
 
 const Background = styled('div')`
@@ -20,7 +19,7 @@ const Background = styled('div')`
   background-image: '${props => props.backgroundImage}';
 `;
 
-const Header = styled(`div`)`
+const Header = styled('div')`
   font-size: 1.5em;
   text-align: center;
   padding: 4px;
@@ -35,8 +34,8 @@ const Player = styled('div')`
   position: relative;
 `;
 
-//height: 667px;
-//width: 375px;
+// height: 667px;
+// width: 375px;
 
 const Artwork = styled('div')`
   max-width: 300px;
@@ -50,7 +49,7 @@ const Artwork = styled('div')`
   background-image: ${props => props.backgroundImage};
 `;
 
-const Title = styled(`div`)`
+const Title = styled('div')`
   width: 80%;
   margin: 20% auto;
   font-size: 12px;
@@ -59,40 +58,33 @@ const Title = styled(`div`)`
   position: relative;
 `;
 
-const httpToStream = (url) => {
-  return new Promise(resolve => {
-    http.get(url, stream=> {
-      resolve(stream);
-    });
-  });
-};
-
 export default class MusicPlayer extends React.Component {
-  constructor(props) {    
+  constructor(props) {
     super(props);
     mediaTags.read(props.track.file, {
       onSuccess: (tag) => {
         console.log(tag.tags);
-        if(tag.tags.year) {
+        if (tag.tags.year) {
           this.props.track.year = tag.tags.year;
         }
-        if(tag.tags.title) {
+        if (tag.tags.title) {
           this.props.track.name = tag.tags.title;
         }
-        if(tag.tags.picture) {
+        if (tag.tags.picture) {
           this.props.track.picture = tag.tags.picture;
         }
-        this.setState({track: this.props.track});
+        this.setState({ track: this.props.track });
       },
       onError: (error) => {
         console.log(error);
       }
     });
-    
-    this.state = { 
+
+    this.state = {
       isPlaying: false,
       currentTime: 0,
-      ...props };
+      ...props
+    };
   }
 
   updateTime = (timestamp) => {
@@ -107,18 +99,17 @@ export default class MusicPlayer extends React.Component {
   };
 
   fadeAudioOut = (audioControl, interval) => {
-    if(audioControl.volume > 0.0) {
-      if(audioControl.volume < 0.30) {
+    if (audioControl.volume > 0.0) {
+      if (audioControl.volume < 0.3) {
         audioControl.volume = 0;
       } else {
         audioControl.volume -= 0.25;
       }
       return false;
-    } else {
-      audioControl.pause();
-      return true;
     }
-  }
+    audioControl.pause();
+    return true;
+  };
 
   togglePlay = () => {
     let { isPlaying } = this.state;
@@ -130,11 +121,11 @@ export default class MusicPlayer extends React.Component {
       const that = this;
       setInterval(() => {
         const { currentTime } = audio;
-        if(!that.props.track.duration) {
+        if (!that.props.track.duration) {
           that.props.track.duration = audio.duration;
         }
         const { duration } = that.props.track;
-        
+
         // Calculate percent of song
         const percent = `${(currentTime / duration) * 100}%`;
         that.updateScrubber(percent);
@@ -142,8 +133,8 @@ export default class MusicPlayer extends React.Component {
       }, 100);
     } else {
       isPlaying = false;
-      let fadeAudio = setInterval(() => {
-        if(this.state.isPlaying || this.fadeAudioOut(audio, fadeAudio)) {
+      const fadeAudio = setInterval(() => {
+        if (this.state.isPlaying || this.fadeAudioOut(audio, fadeAudio)) {
           clearInterval(fadeAudio);
         }
       }, 200);
@@ -152,22 +143,22 @@ export default class MusicPlayer extends React.Component {
   };
 
   render() {
-    const {track} = this.props;
-    const {picture, duration, url} = track;
-    const {isPlaying, currentTime} = this.state;
+    const { track } = this.props;
+    const { picture, duration, url } = track;
+    const { isPlaying, currentTime } = this.state;
     return (
       <Player>
-        <Background backgroundImage= {`url(${picture})`} />
+        <Background backgroundImage={`url(${picture})`} />
         <Header>
           <Title>Now playing</Title>
         </Header>
-        <Artwork backgroundImage= {`url(${picture})`} />
+        <Artwork backgroundImage={`url(${picture})`} />
         <TrackInformation track={this.props.track} />
         <Scrubber />
         <Controls isPlaying={isPlaying} onClick={this.togglePlay} />
         <Timestamps duration={duration} currentTime={currentTime} />
         <audio id="audio">
-          <source src={url} ref={(element) => this.audio = element}/>
+          <source src={url} ref={element => (this.audio = element)} />
         </audio>
       </Player>
     );

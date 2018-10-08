@@ -1,8 +1,8 @@
 import * as React from 'react';
 import styled from 'react-emotion';
-import {MdPlayArrow, MdPause} from 'react-icons/md/';
+import { MdPlayArrow, MdPause } from 'react-icons/md/';
 
-const Controls = styled('div') `
+const Controls = styled('div')`
   position: absolute;
   bottom: 32px;
   pointer-events: none;
@@ -24,30 +24,26 @@ const Button = styled('i')`
   margin: auto;
   pointer-events: all;
 
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.5;
   font-size: 24px;
 
   &:active {
     transform: scale(0.98);
-    background: #FFFFFF;
+    background: #ffffff;
   }
 `;
 
-export default class Scrubber extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+const Scrubber = (props) => {
+  const { isPlaying, onClick } = props;
 
-  render() {
-    const {isPlaying, onClick } = this.props;
-
-    return (
-      <Controls>
-        <Button onClick={onClick} onKeyDown={onClick} tabIndex={0} role="button">
-          {isPlaying ? <MdPause/> : <MdPlayArrow/>}
-        </Button>
-      </Controls>
-    );
-  }
+  return (
+    <Controls>
+      <Button onClick={onClick} onKeyDown={onClick} tabIndex={0} role="button">
+        {isPlaying ? <MdPause /> : <MdPlayArrow />}
+      </Button>
+    </Controls>
+  );
 };
+
+export default Scrubber;

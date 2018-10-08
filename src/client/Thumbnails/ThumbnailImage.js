@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'react-emotion';
 
-const Container = styled('img') `
+const Container = styled('img')`
   max-width: 250px;
   height: auto;
   padding: 5px;
@@ -19,18 +19,14 @@ const Title = styled('div')`
   position: relative;
 `;
 
-export default class ThumbnailImage extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+const ThumbnailImage = (props) => {
+  const { file } = props;
+  return (
+    <div>
+      <Container src={file.url} alt={file.name} />
+      <Title>{file.name}</Title>
+    </div>
+  );
+};
 
-  render() {
-    const { file } = this.props;
-    return (
-      <div>
-        <Container src={file.url} alt={file.name}/>
-        <Title>{file.name}</Title>
-      </div>
-    );
-  }
-}
+export default ThumbnailImage;
