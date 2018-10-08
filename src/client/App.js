@@ -121,7 +121,11 @@ export default class App extends Component {
     this.setState({
       files: [...files, ...newFiles]
     });
-    this.setState({ currentSelected: files[0] });
+  };
+
+  setSelected = (newSelected) => {
+    this.setState({ currentSelected: newSelected });
+    console.log('set new thingy');
   };
 
   render() {
@@ -137,7 +141,7 @@ export default class App extends Component {
           <Row>
             <Column flexGrow={1}>
               <Row>
-                <Column flexGrow={1}>
+                <Column style={{ flex: '50%', maxWidth: '50%' }}>
                   <DropZoneOwn
                     onDrop={this.onDropFiles}
                     accept="image/*, audio/*"
@@ -150,20 +154,22 @@ export default class App extends Component {
                   >
                     <Column flexGrow={1}>
                       <Row horizontal="center">Drop audio/images</Row>
-                      <FileGrid files={files} />
+                      <FileGrid
+                        onSelectedChange={newSelected => this.setSelected(newSelected)}
+                        files={files}
+                      />
                     </Column>
                   </DropZoneOwn>
                 </Column>
-
-                <Column flexGrow={1}>
-                  <Button primary onClick={this.getWaveForm}>
-                    Upload music
-                  </Button>
+                <Column style={{ flex: '50%', maxWidth: '50%' }}>
                   <Viewer file={currentSelected} />
                 </Column>
               </Row>
 
               <Row vertical="center">
+                <Button primary onClick={this.getWaveForm}>
+                  Upload music
+                </Button>
                 <Column flexGrow={1}>
                   <Input defaultValue="songId" onChange={this.setSongId} />
                 </Column>

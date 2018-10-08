@@ -23,17 +23,23 @@ const Column = styled('div')`
 `;
 
 const FileGrid = (props) => {
-  const { files } = props;
+  const { files, onSelectedChange } = props;
 
-  const filesDrawn = [];
+  let filesDrawn = [];
   if (files) {
-    for (let i = 0; i < files.length; i++) {
-      filesDrawn.push(
-        <Column key={i}>
-          <Thumbnail file={files[i]} />
-        </Column>
-      );
-    }
+    console.log(files);
+    filesDrawn = files.map((fileElement, i) => (
+      <Column key={i}>
+        <Thumbnail
+          onSelect={() => {
+            console.log(fileElement);
+            console.log(i);
+            onSelectedChange(fileElement);
+          }}
+          file={fileElement}
+        />
+      </Column>
+    ));
   }
 
   return <FlexGrid>{filesDrawn}</FlexGrid>;

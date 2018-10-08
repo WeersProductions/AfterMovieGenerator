@@ -1,12 +1,10 @@
 import * as React from 'react';
 import styled from 'react-emotion';
-import ThumbnailImage from './ThumbnailImage';
-import ThumbnailAudio from './ThumbnailAudio';
+import DetailedAudio from './DetailedAudio';
+import DetailedImage from './DetailedImage';
 
 const Container = styled('div')`
-  width: 250px;
-  height: auto;
-  padding: 5px;
+  max-width: 100%;
   border: 1px solid #ddd;
   border-radius: 4px;
   vertical-align: middle;
@@ -21,23 +19,23 @@ const Title = styled('div')`
   position: relative;
 `;
 
-const Thumbnail = (props) => {
-  const { file, onSelect } = props;
+const DetailedView = (props) => {
+  const { file } = props;
 
   let fileComponent;
   if (file.type.includes('image')) {
-    fileComponent = <ThumbnailImage file={file} />;
+    fileComponent = <DetailedImage file={file} />;
   }
   if (file.type.includes('audio')) {
-    fileComponent = <ThumbnailAudio file={file} />;
+    fileComponent = <DetailedAudio file={file} />;
   }
 
   return (
-    <Container onClick={() => onSelect()}>
+    <Container>
       {fileComponent}
       <Title>{file.name}</Title>
     </Container>
   );
 };
 
-export default Thumbnail;
+export default DetailedView;

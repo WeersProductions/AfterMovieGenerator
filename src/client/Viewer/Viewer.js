@@ -1,18 +1,18 @@
 import * as React from 'react';
 import styled from 'react-emotion';
-import MusicPlayer from '../MusicPlayer/MusicPlayer';
+import DetailedView from './DetailedViews/DetailedView';
 
-const FileGrid = (props) => {
+const Viewer = (props) => {
   const { file, multiple } = props;
 
   let fileDrawn = null;
   if (multiple) {
     fileDrawn = 'Multiple selected';
+  } else {
+    fileDrawn = <DetailedView file={file} />;
   }
 
-  fileDrawn = <MusicPlayer track={file} />;
-
-  return <div>{file ? fileDrawn : null}</div>;
+  return <div>{file ? fileDrawn : 'No file selected'}</div>;
 };
 
-export default FileGrid;
+export default Viewer;

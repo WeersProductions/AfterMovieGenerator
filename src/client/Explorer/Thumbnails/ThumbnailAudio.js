@@ -29,10 +29,11 @@ const Background = styled('div')`
 
 const ThumbnailAudio = (props) => {
   const { file } = props;
+  // <Background backgroundImage={`url(${file.picture})`} />
   return (
     <div>
       <Artwork backgroundImage={`url(${file.picture})`} />
-      <Background backgroundImage={`url(${file.picture})`} />
+
       <TrackInformation track={file} />
     </div>
   );
