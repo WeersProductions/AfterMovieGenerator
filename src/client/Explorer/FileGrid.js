@@ -1,8 +1,7 @@
 import * as React from 'react';
 import styled from 'react-emotion';
-import MusicPlayer from './MusicPlayer/MusicPlayer';
-import ThumbnailImage from './Thumbnails/ThumbnailImage';
-import ThumbnailAudio from './Thumbnails/ThumbnailAudio';
+import ThumbnailImage from '../Thumbnails/ThumbnailImage';
+import ThumbnailAudio from '../Thumbnails/ThumbnailAudio';
 
 const FlexGrid = styled('div') `
   display: flex;

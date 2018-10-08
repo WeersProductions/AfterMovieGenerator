@@ -5,7 +5,8 @@ import { Column, Row } from 'simple-flexbox';
 import DropZone from 'react-dropzone';
 import ReactPlayer from 'react-player';
 
-import FileGrid from './FileGrid';
+import FileGrid from './Explorer/FileGrid';
+import Viewer from './Viewer/Viewer';
 
 const Input = styled('input')`
   padding: 0.5em;
@@ -69,7 +70,8 @@ export default class App extends Component {
     waveform: null,
     songId: '',
     videoResult: null,
-    files: []
+    files: [],
+    currentSelected: null
   };
 
   componentDidMount() {
@@ -118,11 +120,12 @@ export default class App extends Component {
     this.setState({
       files: [...files, ...newFiles]
     });
+    this.setState({currentSelected: files[0]});
   };
 
   render() {
     const {
-      waveform, songId, videoResult, files
+      waveform, songId, videoResult, files, currentSelected
     } = this.state;
     
     
@@ -147,7 +150,6 @@ export default class App extends Component {
                   >
                     <Column flexGrow={1}>
                       <Row horizontal="center">Drop audio/images</Row>
-                      
                       <FileGrid files={files}/>
                     </Column>
                   </DropZoneOwn>
@@ -157,6 +159,7 @@ export default class App extends Component {
                   <Button primary onClick={this.getWaveForm}>
                     Upload music
                   </Button>
+                  <Viewer file={currentSelected}/>
                 </Column>
               </Row>
 
