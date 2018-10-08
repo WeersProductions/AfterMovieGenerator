@@ -1,7 +1,8 @@
 import * as React from 'react';
 import styled from 'react-emotion';
-import ThumbnailImage from '../Thumbnails/ThumbnailImage';
-import ThumbnailAudio from '../Thumbnails/ThumbnailAudio';
+import ThumbnailImage from './Thumbnails/ThumbnailImage';
+import ThumbnailAudio from './Thumbnails/ThumbnailAudio';
+import Thumbnail from './Thumbnails/Thumbnail';
 
 const FlexGrid = styled('div')`
   display: flex;
@@ -25,23 +26,13 @@ const FileGrid = (props) => {
   const { files } = props;
 
   const filesDrawn = [];
-  // <MusicPlayer style={{width: '375px', height: '667px'}} track={files[i]} />
   if (files) {
     for (let i = 0; i < files.length; i++) {
-      if (files[i].type.includes('image')) {
-        filesDrawn.push(
-          <Column key={i}>
-            <ThumbnailImage file={files[i]} />
-          </Column>
-        );
-      }
-      if (files[i].type.includes('audio')) {
-        filesDrawn.push(
-          <Column key={i}>
-            <ThumbnailAudio file={files[i]} />
-          </Column>
-        );
-      }
+      filesDrawn.push(
+        <Column key={i}>
+          <Thumbnail file={files[i]} />
+        </Column>
+      );
     }
   }
 

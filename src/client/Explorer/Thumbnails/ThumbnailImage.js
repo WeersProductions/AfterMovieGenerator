@@ -2,12 +2,8 @@ import * as React from 'react';
 import styled from 'react-emotion';
 
 const Container = styled('img')`
-  max-width: 250px;
+  max-width: 100%;
   height: auto;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  vertical-align: middle;
 `;
 
 const Title = styled('div')`
@@ -24,7 +20,6 @@ const ThumbnailImage = (props) => {
   return (
     <div>
       <Container src={file.url} alt={file.name} />
-      <Title>{file.name}</Title>
     </div>
   );
 };
