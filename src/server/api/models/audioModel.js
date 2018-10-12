@@ -29,7 +29,9 @@ const SongSchema = new Schema({
   duration: {
     type: Number
   },
-  rawSong: Buffer
+  src: {
+    type: String
+  }
 });
 
 module.exports = mongoose.model('Songs', SongSchema);

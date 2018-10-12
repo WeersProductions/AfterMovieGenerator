@@ -142,6 +142,13 @@ export default class MusicPlayer extends React.Component {
     this.setState({ isPlaying });
   };
 
+  pause = () => {
+    const { isPlaying } = this.state;
+    if (isPlaying) {
+      this.togglePlay();
+    }
+  };
+
   render() {
     const { track } = this.props;
     const { picture, duration, url } = track;

@@ -4,11 +4,11 @@ const express = require('express');
 
 const app = express();
 
-const port = process.env.PORT || 5000;
-
 const bodyParser = require('body-parser');
 
 const mongoose = require('mongoose');
+
+const config = require('./config');
 
 require('./api/models/audioModel');
 require('./api/models/videoModel');
@@ -32,6 +32,7 @@ const videoRoutes = require('./api/routes/videoRoutes');
 
 videoRoutes(app);
 
-app.listen(port);
-
-console.log(`audio RESTful API server started on: ${port}`);
+const server = app.listen(config.get('PORT'), () => {
+  const { port } = server.address();
+  console.log(`audio RESTful API server started on: ${port}`);
+});

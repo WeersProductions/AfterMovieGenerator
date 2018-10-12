@@ -23,8 +23,12 @@ const calcTempo = function calcTempo(buffer) {
   onBPM(mt);
 };
 
-export default function getBPM(data, onComplete) {
+const getBPM = function getBPM(data, onComplete) {
   onBPM = onComplete;
   const context = new AudioContext();
   context.decodeAudioData(data, calcTempo);
-}
+};
+
+module.exports = {
+  getBPM
+};

@@ -11,9 +11,11 @@ const ffmpeg = require('fluent-ffmpeg');
 const mongoose = require('mongoose');
 
 const os = require('os');
-const bpmDetector = require('./bpmController');
+const bpmControler = require('./bpmController');
 
 const Song = mongoose.model('Songs');
+
+const FileHosting = require('../helpers/fileHosting');
 
 const WIDTH = 1800;
 const HEIGHT = 280;
@@ -68,7 +70,8 @@ exports.get_song = function getSong(req, res) {
       interestingPoints: song.interestingPoints,
       totalMax: song.totalMax,
       date: song.date,
-      duration: song.duration
+      duration: song.duration,
+      src: song.src
     });
   });
 };
@@ -85,14 +88,17 @@ exports.read_audio = function readAudio(req, res) {
     } else {
       const { file } = files;
 
-      const rawSong = fs.readFileSync(file.path);
-      const songData = createSongData(file.name, rawSong);
+      console.log(file);
+
+      file.buffer = fs.readFileSync(file.path);
+      const songData = createSongData(file.name, file);
       const songId = songData._id;
 
       // Return the new instance, with the id.
       res.send(songId);
 
-      bpmDetector.getBPM(rawSong, (bpmData) => {
+      // Uncomment this to automatically analyze the song.
+      bpmControler.getBPM(file.buffer, (bpmData) => {
         updateSongData(songId, 'beats', bpmData.beats);
         updateSongData(songId, 'bpm', bpmData.tempo);
         deepAnalyzeSong(file.path, bpmData, songId);
@@ -104,9 +110,9 @@ exports.read_audio = function readAudio(req, res) {
 exports.reanalyze_audio = function reanalyzeAudio(req, res) {
   exports.get_song_from_database(req.params.songId, (songData) => {
     const filePath = `${os.tmpdir() + parseInt(Math.random() * 1000000, 10)}.mp3`;
-    fs.writeFileSync(filePath, songData.rawSong);
+    // fs.writeFileSync(filePath, songData.rawSong);
     deepAnalyzeSong(
-      filePath,
+      songData.src,
       {
         beats: songData.beats,
         bpm: songData.bpm
@@ -144,13 +150,13 @@ exports.get_video_beats = function getVideoBeats(beats, amount) {
  * @param {*} songId
  * @param {*} onFinished
  */
-exports.save_song_tmp = function (songId, onFinished) {
-  this.get_song_from_database(songId, (song) => {
-    const path = `${os.tmpdir}/tmpSong.mp3`;
-    fs.writeFileSync(path, song.rawSong);
-    onFinished(path);
-  });
-};
+// exports.save_song_tmp = function saveSongTmp(songId, onFinished) {
+//   this.get_song_from_database(songId, (song) => {
+//     const path = `${os.tmpdir}/tmpSong.mp3`;
+//     fs.writeFileSync(path, song.rawSong);
+//     onFinished(path);
+//   });
+// };
 
 function deepAnalyzeSong(filePath, bpmData, songId, onFinished) {
   peaks = new Array(WIDTH);
@@ -200,7 +206,7 @@ function deepAnalyzeSong(filePath, bpmData, songId, onFinished) {
   });
 }
 
-function createSongData(name, rawSong) {
+function createSongData(name, file) {
   const newInstance = new Song({
     name
   });
@@ -209,7 +215,15 @@ function createSongData(name, rawSong) {
     if (err) {
       console.log(err);
     }
-    updateSongData(newInstance._id, 'rawSong', rawSong);
+    // updateSongData(newInstance._id, 'rawSong', rawSong);
+
+    FileHosting.sendFileToGCS(file, (uploadErr) => {
+      if (uploadErr) {
+        console.log(uploadErr);
+      }
+      console.log(file);
+      updateSongData(newInstance._id, 'src', file.cloudStoragePublicUrl);
+    });
   });
   return newInstance;
 }
