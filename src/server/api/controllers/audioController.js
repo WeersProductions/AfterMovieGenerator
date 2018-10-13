@@ -15,7 +15,7 @@ const bpmControler = require('./bpmController');
 
 const Song = mongoose.model('Songs');
 
-const FileHosting = require('../helpers/fileHosting');
+const FileHosting = require('../lib/fileHosting');
 
 const WIDTH = 1800;
 const HEIGHT = 280;
