@@ -88,8 +88,6 @@ exports.read_audio = function readAudio(req, res) {
     } else {
       const { file } = files;
 
-      console.log(file);
-
       file.buffer = fs.readFileSync(file.path);
       const songData = createSongData(file.name, file);
       const songId = songData._id;
@@ -144,19 +142,6 @@ exports.get_video_beats = function getVideoBeats(beats, amount) {
   }
   return analyzedBeats;
 };
-
-/**
- * Temporarely save a song buffer from the database to the filesystem and return the path.
- * @param {*} songId
- * @param {*} onFinished
- */
-// exports.save_song_tmp = function saveSongTmp(songId, onFinished) {
-//   this.get_song_from_database(songId, (song) => {
-//     const path = `${os.tmpdir}/tmpSong.mp3`;
-//     fs.writeFileSync(path, song.rawSong);
-//     onFinished(path);
-//   });
-// };
 
 function deepAnalyzeSong(filePath, bpmData, songId, onFinished) {
   peaks = new Array(WIDTH);

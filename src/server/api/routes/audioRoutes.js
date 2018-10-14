@@ -1,4 +1,5 @@
 const audioController = require('../controllers/audioController');
+const oauth2 = require('../lib/oauth2');
 
 module.exports = function audioRoute(app) {
   app.route('/api/audio').post(audioController.read_audio);
@@ -8,7 +9,7 @@ module.exports = function audioRoute(app) {
   // .put(audioController.update_audio)
   // .delete(audioController.delete_audio);
 
-  app.route('/api/:songId').get(audioController.get_song);
+  app.route('/api/:songId').get(oauth2.required, audioController.get_song);
 
   app.route('/api/update/:songId').get(audioController.reanalyze_audio);
 };

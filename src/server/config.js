@@ -1,4 +1,6 @@
-const nconf = (module.exports = require('nconf'));
+const nconf = require('nconf');
+
+module.exports = nconf;
 const path = require('path');
 
 nconf
@@ -17,7 +19,8 @@ nconf
     'SECRET',
     'OAUTH2_CLIENT_ID',
     'OAUTH2_CLIENT_SECRET',
-    'OAUTH2_CLIENT_CALLBACK'
+    'OAUTH2_CLIENT_CALLBACK',
+    'DATABASE_URL'
   ])
   // 3. Config file
   .file({ file: path.join(__dirname, 'config.json') })
@@ -36,7 +39,9 @@ nconf
     GCLOUD_PROJECT: 'aftermoviegenerator',
     PORT: 5000,
 
-    SECRET: 'keyboardcat'
+    SECRET: 'keyboardcat',
+
+    DATABASE_URL: 'mongodb://localhost:27017/Songdb'
   });
 
 // CHeck for required settings
@@ -44,6 +49,7 @@ checkConfig('GCLOUD_PROJECT');
 checkConfig('CLOUD_BUCKET');
 checkConfig('OAUTH2_CLIENT_ID');
 checkConfig('OAUTH2_CLIENT_SECRET');
+checkConfig('DATABASE_URL');
 
 if (nconf.get('DATA_BACKEND') === 'cloudsql') {
   checkConfig('MYSQL_USER');
