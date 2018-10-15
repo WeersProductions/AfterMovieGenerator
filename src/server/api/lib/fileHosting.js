@@ -19,36 +19,52 @@ function getPublicUrl(filename) {
 }
 // [END public_url]
 
-function sendFileToGCS(file, onFinish) {
-  if (!file) {
+function sendFileToGCS(localFile, onFinish, owner) {
+  console.log(owner);
+  if (!localFile) {
     onFinish();
     return;
   }
 
-  const gcsname = Date.now() + file.name;
+  const gcsname = Date.now() + localFile.name;
   const bucketFile = bucket.file(gcsname);
 
   const stream = bucketFile.createWriteStream({
     metadata: {
-      contentType: file.type
+      contentType: localFile.type
     },
     resumable: false
   });
 
   stream.on('error', (err) => {
-    file.cloudStorageError = err;
+    localFile.cloudStorageError = err;
     onFinish(err);
   });
 
   stream.on('finish', () => {
-    file.cloudStorageObject = gcsname;
-    bucketFile.makePublic().then(() => {
-      file.cloudStoragePublicUrl = getPublicUrl(gcsname);
-      onFinish();
-    });
+    localFile.cloudStorageObject = gcsname;
+    // bucketFile.makePublic().then(() => {
+    //   localFile.cloudStoragePublicUrl = getPublicUrl(gcsname);
+    //   onFinish();
+    // });
+    bucketFile.acl.add(
+      {
+        entity: owner.id,
+        role: 'OWNER_ROLE'
+      },
+      (err, aclObject, apiResponse) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(aclObject);
+        console.log(apiResponse);
+        localFile.cloudStoragePublicUrl = getPublicUrl(gcsname);
+        onFinish();
+      }
+    );
   });
 
-  stream.end(file.buffer);
+  stream.end(localFile.buffer);
 }
 // [END process]
 

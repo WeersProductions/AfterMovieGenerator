@@ -16,6 +16,9 @@ const config = require('./config');
 // Get database models.
 require('./api/models/audioModel');
 require('./api/models/videoModel');
+require('./api/models/fileModel');
+require('./api/models/userModel');
+require('./api/models/fileOwnerModel');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(
@@ -54,7 +57,10 @@ app.use(session(sessionConfig));
 // OAuth2
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(require('./api/lib/oauth2').router);
+const oath2 = require('./api/lib/oauth2');
+
+app.use(oath2.router);
+app.use(oath2.template);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

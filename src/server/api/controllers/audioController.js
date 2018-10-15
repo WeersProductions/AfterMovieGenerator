@@ -16,6 +16,7 @@ const bpmControler = require('./bpmController');
 const Song = mongoose.model('Songs');
 
 const FileHosting = require('../lib/fileHosting');
+const UserController = require('../lib/userController');
 
 const WIDTH = 1800;
 const HEIGHT = 280;
@@ -89,7 +90,7 @@ exports.read_audio = function readAudio(req, res) {
       const { file } = files;
 
       file.buffer = fs.readFileSync(file.path);
-      const songData = createSongData(file.name, file);
+      const songData = createSongData(file.name, file, req.profile);
       const songId = songData._id;
 
       // Return the new instance, with the id.
@@ -191,7 +192,7 @@ function deepAnalyzeSong(filePath, bpmData, songId, onFinished) {
   });
 }
 
-function createSongData(name, file) {
+function createSongData(name, file, owner) {
   const newInstance = new Song({
     name
   });
@@ -200,15 +201,18 @@ function createSongData(name, file) {
     if (err) {
       console.log(err);
     }
-    // updateSongData(newInstance._id, 'rawSong', rawSong);
 
-    FileHosting.sendFileToGCS(file, (uploadErr) => {
-      if (uploadErr) {
-        console.log(uploadErr);
-      }
-      console.log(file);
-      updateSongData(newInstance._id, 'src', file.cloudStoragePublicUrl);
-    });
+    FileHosting.sendFileToGCS(
+      file,
+      (uploadErr) => {
+        if (uploadErr) {
+          console.log(uploadErr);
+        }
+        console.log(file);
+        updateSongData(newInstance._id, 'src', file.cloudStoragePublicUrl);
+      },
+      owner
+    );
   });
   return newInstance;
 }
