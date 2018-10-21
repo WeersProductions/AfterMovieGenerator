@@ -1,42 +1,21 @@
-const mongoose = require('mongoose');
-
 const UserController = require('./userController');
 
-// Load models.
-const File = mongoose.model('Files');
-const FileOwner = mongoose.model('FileOwners');
+const db = require('../db');
 
 exports.add_file = function addFile(email, fileSrc) {
-  const newFile = new File({
-    fileSrc
-  });
-
-  newFile.save((err) => {
-    if (err) {
-      console.log(err);
-    }
-
-    const newFileOwner = new FileOwner({
-      fileId: newFile._id,
-      userId: UserController.get_user(email)._id
-    });
-    console.log(newFileOwner);
-
-    newFileOwner.save((fileOwnerError) => {
-      if (fileOwnerError) {
-        console.log(fileOwnerError);
-      }
-      return newFile;
-    });
-  });
+  const { rows } = db.query(
+    'with new_file as (insert into file (src, datatype) values ($1, $2) returning file_id) insert into fileowner (file_id) values((select file_id from new_file), (select account.account_id from account where account.email=$3));',
+    [email, 'TODO:insert file type', fileSrc]
+  );
+  return rows[0];
 };
 
-exports.get_files = function getFiles(email) {
-  User.find({ userId: UserController.get_user(email)._id }, (err, fileOwner) => {
-    if (err) {
-      console.log(err);
-    }
-    console.log(user);
-    return user;
-  });
+exports.get_files = async function getFiles(email) {
+  const { rows } = db.query(
+    'SELECT file.* FROM file, account, fileowner WHERE account.email=$1 AND fileowner.account_id=account.account_id AND file.file_id=fileowner.file_id;',
+    [email]
+  );
+  console.log('Get_files result:');
+  console.log(rows);
+  return rows;
 };

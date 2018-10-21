@@ -8,12 +8,10 @@ const Canvas = require('canvas');
 
 const ffmpeg = require('fluent-ffmpeg');
 
-const mongoose = require('mongoose');
-
 const os = require('os');
 const bpmControler = require('./bpmController');
 
-const Song = mongoose.model('Songs');
+const db = require('../db');
 
 const FileHosting = require('../lib/fileHosting');
 const UserController = require('../lib/userController');
@@ -38,27 +36,39 @@ let groupSize = 0;
 
 const slideshowDuration = 3;
 
-exports.get_song_from_database = function getSongFromDatabase(songId, onFound) {
-  Song.findById(songId, (err, song) => {
-    if (err) {
-      onFound(err);
-    } else {
-      onFound(song);
-    }
-  });
+exports.get_song_from_database = async function getSongFromDatabase(songId) {
+  // Song.findById(songId, (err, song) => {
+  //   if (err) {
+  //     onFound(err);
+  //   } else {
+  //     onFound(song);
+  //   }
+  // });
+
+  const { rows } = await db.query('SELECT * FROM song WHERE id = $1', [songId]);
+
+  return rows[0];
 };
 
-exports.get_song_waveform = function getSongWaveform(req, res) {
-  Song.findById(req.params.songId, (err, song) => {
-    if (err) {
-      res.send(err);
-    }
-    res.writeHead(200, { 'Content-Type': 'image/png' });
-    res.end(
-      createPNG(song.totalMax, song.peaks, song.interestingPoints, song.duration, song.beats),
-      'binary'
-    );
-  });
+exports.get_song_waveform = async function getSongWaveform(req, res) {
+  const song = await this.get_song_from_database(req.params.songId);
+
+  res.writeHead(200, { 'Content-Type': 'image/png' });
+  res.end(
+    createPNG(song.totalMax, song.peaks, song.interestingPoints, song.duration, song.beats),
+    'binary'
+  );
+
+  // Song.findById(req.params.songId, (err, song) => {
+  //   if (err) {
+  //     res.send(err);
+  //   }
+  //   res.writeHead(200, { 'Content-Type': 'image/png' });
+  //   res.end(
+  //     createPNG(song.totalMax, song.peaks, song.interestingPoints, song.duration, song.beats),
+  //     'binary'
+  //   );
+  // });
 };
 
 exports.get_song = function getSong(req, res) {
@@ -90,8 +100,7 @@ exports.read_audio = function readAudio(req, res) {
       const { file } = files;
 
       file.buffer = fs.readFileSync(file.path);
-      const songData = createSongData(file.name, file, req.profile);
-      const songId = songData._id;
+      const songId = createSongData(file.name, file, req.profile);
 
       // Return the new instance, with the id.
       res.send(songId);
@@ -192,42 +201,32 @@ function deepAnalyzeSong(filePath, bpmData, songId, onFinished) {
   });
 }
 
-function createSongData(name, file, owner) {
-  const newInstance = new Song({
-    name
-  });
+async function createSongData(name, file, owner) {
+  const { rows } = await db.query(
+    'with new_file as (insert into file (datatype) values ($1) returning file_id)  insert into song (file_id) values ((select file_id from new_file))',
+    [file.type]
+  );
 
-  newInstance.save((err) => {
-    if (err) {
-      console.log(err);
-    }
-
-    FileHosting.sendFileToGCS(
-      file,
-      (uploadErr) => {
-        if (uploadErr) {
-          console.log(uploadErr);
-        }
-        console.log(file);
-        updateSongData(newInstance._id, 'src', file.cloudStoragePublicUrl);
-      },
-      owner
-    );
-  });
-  return newInstance;
+  FileHosting.sendFileToGCS(
+    file,
+    (uploadErr) => {
+      if (uploadErr) {
+        console.log(uploadErr);
+      }
+      console.log(file);
+      updateFileData(rows[0].song_id, 'src', file.cloudStoragePublicUrl);
+    },
+    owner
+  );
+  return rows[0].song_id;
 }
 
-function updateSongData(id, key, value) {
-  Song.findByIdAndUpdate(id, { [key]: value }, (err, server) => {
-    if (err) {
-      console.log(err);
-    }
-    if (!server) {
-      console.log(
-        "Song: Seems like it didn't find this id, creation is probably slower than this update."
-      );
-    }
-  });
+async function updateSongData(id, key, value) {
+  const { rows } = await db.query('UPDATE song SET $1 = $2 WHERE song_id=$3', [key, value, id]);
+}
+
+async function updateFileData(id, key, value) {
+  const { rows } = await db.query('UPDATE file SET $1 = $2 WHERE file_id=$3', [key, value, id]);
 }
 
 function storePeak(duration, beats) {

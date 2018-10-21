@@ -6,12 +6,9 @@ const { IncomingForm } = require('formidable');
 
 const os = require('os');
 
-const mongoose = require('mongoose');
-
 const audioController = require('./audioController');
 
-const Song = mongoose.model('Songs');
-const Video = mongoose.model('Videos');
+const db = require('../db');
 
 exports.create_video = function createVideo(req, res) {
   const form = new IncomingForm();
@@ -29,12 +26,8 @@ exports.create_video = function createVideo(req, res) {
       Object.values(files).forEach((value) => {
         filePaths.push(value.path);
       });
-      //   for (const key in files) {
-      //     const file = files[key];
-      //     filePaths.push(file.path);
-      //   }
 
-      const videoData = createVideoData('new_video', filePaths);
+      const videoData = createVideoData('media/video', filePaths);
       const videoId = videoData._id;
 
       // Send back the videoId, this way the client doesn't have to wait.
@@ -75,46 +68,24 @@ exports.create_video = function createVideo(req, res) {
 };
 
 exports.get_video = function getVideo(req, res) {
-  getVideoData(req.params.videoId, (video) => {
-    res.send(video);
-  });
+  return getVideoData(req.params.videoId);
 };
 
-function getVideoData(videoId, onFound) {
-  Video.findById(videoId, (err, video) => {
-    if (err) {
-      onFound(err);
-    } else {
-      onFound(video);
-    }
-  });
+async function getVideoData(videoId) {
+  const { rows } = await db.query('SELECT * FROM video WHERE video_id=$1', [videoId]);
+  return rows[0];
 }
 
-function createVideoData(name, filePaths) {
-  const newInstance = new Video({
-    name,
-    filePaths
-  });
-
-  newInstance.save((err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
-  return newInstance;
+async function createVideoData(fileType, filePaths) {
+  const { rows } = await db.query(
+    'with new_file as (insert into file (datatype) values ($1) returning file_id)  insert into video (file_id) values ((select file_id from new_file))',
+    [fileType]
+  );
+  return rows[0];
 }
 
-function updateVideoData(id, key, value) {
-  Video.findByIdAndUpdate(id, { [key]: value }, (err, server) => {
-    if (err) {
-      console.log(err);
-    }
-    if (!server) {
-      console.log(
-        "Video: Seems like it didn't find this id, creation is probably slower than this update."
-      );
-    }
-  });
+async function updateVideoData(id, key, value) {
+  const { rows } = await db.query('UPDATE video SET $1 = $2 WHERE video_id=$3', [key, value, id]);
 }
 
 function ffmpegCreateVideo(command, onFinished) {

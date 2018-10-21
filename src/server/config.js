@@ -12,8 +12,8 @@ nconf
     'DATA_BACKEND',
     'GCLOUD_PROJECT',
     'INSTANCE_CONNECTION_NAME',
-    'MYSQL_USER',
-    'MYSQL_PASSWORD',
+    'SQL_USER',
+    'SQL_PASSWORD',
     'NODE_ENV',
     'PORT',
     'SECRET',
@@ -29,7 +29,7 @@ nconf
     // Typically you will create a bucket with the same name as your project ID.
     CLOUD_BUCKET: 'aftermoviegenerator',
 
-    DATA_BACKEND: 'mongodb',
+    DATA_BACKEND: 'postgresql',
 
     OAUTH2_CLIENT_ID: '',
     OAUTH2_CLIENT_SECRET: '',
@@ -41,7 +41,7 @@ nconf
 
     SECRET: 'keyboardcat',
 
-    DATABASE_URL: 'mongodb://localhost:27017/Songdb'
+    DATABASE_URL: 'postgresql://localhost:27017'
   });
 
 // CHeck for required settings
@@ -51,9 +51,9 @@ checkConfig('OAUTH2_CLIENT_ID');
 checkConfig('OAUTH2_CLIENT_SECRET');
 checkConfig('DATABASE_URL');
 
-if (nconf.get('DATA_BACKEND') === 'cloudsql') {
-  checkConfig('MYSQL_USER');
-  checkConfig('MYSQL_PASSWORD');
+if (nconf.get('DATA_BACKEND') === 'postgresql') {
+  checkConfig('SQL_USER');
+  checkConfig('SQL_PASSWORD');
   if (nconf.get('NODE_ENV') === 'production') {
     checkConfig('INSTANCE_CONNECTION_NAME');
   }

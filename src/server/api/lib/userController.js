@@ -1,28 +1,14 @@
-const mongoose = require('mongoose');
-
-const User = mongoose.model('Users');
+const db = require('../db');
 
 exports.add_user = function addUser(email, accountSource) {
-  const newUser = new User({
+  const { rows } = db.query('INSERT INTO account(email, accountsource) values($1, $2);', [
     email,
     accountSource
-  });
-
-  newUser.save((err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
-
-  return newUser;
+  ]);
+  return rows[0];
 };
 
-exports.get_user = function getUser(email) {
-  User.findOne({ email }, (err, user) => {
-    if (err) {
-      console.log(err);
-    }
-    console.log(user);
-    return user;
-  });
+exports.get_account = function getAccount(email) {
+  const { rows } = db.query('SELECT * FROM account WHERE account.email = $1;', [email]);
+  return rows[0];
 };
