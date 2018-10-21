@@ -1,7 +1,12 @@
 const { Pool } = require('pg');
+const config = require('../../config');
 
-// TODO: set username and password.
-const pool = new Pool();
+const pool = new Pool({
+  user: config.get('SQL_USER'),
+  password: config.get('SQL_PASSWORD'),
+  database: config.get('DATABASE_NAME'),
+  connectionString: config.get('DATABASE_URL')
+});
 
 module.exports = {
   query: (text, params) => {

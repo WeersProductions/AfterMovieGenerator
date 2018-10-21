@@ -20,7 +20,8 @@ nconf
     'OAUTH2_CLIENT_ID',
     'OAUTH2_CLIENT_SECRET',
     'OAUTH2_CLIENT_CALLBACK',
-    'DATABASE_URL'
+    'DATABASE_URL',
+    'DATABASE_NAME'
   ])
   // 3. Config file
   .file({ file: path.join(__dirname, 'config.json') })
@@ -41,7 +42,8 @@ nconf
 
     SECRET: 'keyboardcat',
 
-    DATABASE_URL: 'postgresql://localhost:27017'
+    DATABASE_URL: 'postgresql://localhost:27017',
+    DATABASE_NAME: 'aftermovie'
   });
 
 // CHeck for required settings
@@ -54,6 +56,7 @@ checkConfig('DATABASE_URL');
 if (nconf.get('DATA_BACKEND') === 'postgresql') {
   checkConfig('SQL_USER');
   checkConfig('SQL_PASSWORD');
+  checkConfig('DATABASE_NAME');
   if (nconf.get('NODE_ENV') === 'production') {
     checkConfig('INSTANCE_CONNECTION_NAME');
   }

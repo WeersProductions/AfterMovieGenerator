@@ -18,12 +18,6 @@ require('./api/models/fileModel');
 require('./api/models/userModel');
 require('./api/models/fileOwnerModel');
 
-// mongoose.Promise = global.Promise;
-// mongoose.connect(
-//   config.get('DATABASE_URL'),
-//   { useNewUrlParser: true }
-// );
-
 // [START session]
 // Configure the session and session storage
 const sessionConfig = {
