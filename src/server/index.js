@@ -11,13 +11,6 @@ const MemcachedStore = require('connect-memjs')(session);
 const passport = require('passport');
 const config = require('./config');
 
-// Get database models.
-require('./api/models/audioModel');
-require('./api/models/videoModel');
-require('./api/models/fileModel');
-require('./api/models/userModel');
-require('./api/models/fileOwnerModel');
-
 // [START session]
 // Configure the session and session storage
 const sessionConfig = {

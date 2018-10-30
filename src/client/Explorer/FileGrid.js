@@ -32,8 +32,6 @@ const FileGrid = (props) => {
       <Column key={i}>
         <Thumbnail
           onSelect={() => {
-            console.log(fileElement);
-            console.log(i);
             onSelectedChange(fileElement);
           }}
           file={fileElement}

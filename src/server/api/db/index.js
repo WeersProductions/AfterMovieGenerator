@@ -5,13 +5,25 @@ const pool = new Pool({
   user: config.get('SQL_USER'),
   password: config.get('SQL_PASSWORD'),
   database: config.get('DATABASE_NAME'),
-  connectionString: config.get('DATABASE_URL')
+  // connectionString: config.get('DATABASE_URL'),
+  port: '27017',
+  host: 'localhost'
 });
 
 module.exports = {
-  query: (text, params) => {
+  query: async (text, params) => {
+    await pool
+      .connect()
+      .catch(() => {
+        console.log('Failed to connect to database.');
+      })
+      .then(() => {
+        console.log('Connected to the PSQL server.');
+      });
+    console.log('Going to query', { text, params });
     const start = Date.now();
-    const result = pool.query(text, params);
+    const result = await pool.query(text, params);
+    console.log(result);
     const duration = Date.now() - start;
     console.log('executed query', { text, duration, rows: result.rowCount });
     return result;

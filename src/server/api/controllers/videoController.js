@@ -78,14 +78,14 @@ async function getVideoData(videoId) {
 
 async function createVideoData(fileType, filePaths) {
   const { rows } = await db.query(
-    'with new_file as (insert into file (datatype) values ($1) returning file_id)  insert into video (file_id) values ((select file_id from new_file))',
+    'with new_file as (insert into File (data_type) values ($1) returning file_id)  insert into video (file_id) values ((select file_id from new_file))',
     [fileType]
   );
   return rows[0];
 }
 
 async function updateVideoData(id, key, value) {
-  const { rows } = await db.query('UPDATE video SET $1 = $2 WHERE video_id=$3', [key, value, id]);
+  const { rows } = await db.query(`UPDATE video SET ${key} = $2 WHERE video_id=$3`, [value, id]);
 }
 
 function ffmpegCreateVideo(command, onFinished) {

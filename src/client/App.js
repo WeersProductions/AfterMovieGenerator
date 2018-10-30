@@ -8,6 +8,24 @@ import ReactPlayer from 'react-player';
 import FileGrid from './Explorer/FileGrid';
 import Viewer from './Viewer/Viewer';
 
+const API_KEY = '724147129031-k64gv5b60hrm7tafslgk8te0ui8q07k9.apps.googleusercontent.com';
+
+const loadGoogleAPI = () => {
+  const script = document.createElement('script');
+  script.src = 'https://apis.google.com/js/client.js';
+
+  script.onload = () => {
+    gapi.load('client', () => {
+      gapi.client.setApiKey(API_KEY);
+      gapi.client.load('youtube', 'v3', () => {
+        this.setState({ gapiReady: true });
+      });
+    });
+  };
+
+  document.body.appendChild(script);
+};
+
 const Input = styled('input')`
   padding: 0.5em;
   margin: 0.5em;
@@ -76,6 +94,7 @@ export default class App extends Component {
 
   componentDidMount() {
     this.setState({ songId: '5b91297d6534697f83afaf3e' });
+    loadGoogleAPI();
     // fetch('/api/getUsername')
     //   .then(res => res.json())
     //   .then(result => this.setState({ waveform: result.username }));
@@ -116,6 +135,27 @@ export default class App extends Component {
       });
     }
 
+    // TODO: extract this as a seperate method
+    // Upload the new dropped files to the server!
+    const xmlHttpRequest = new XMLHttpRequest();
+    const uploadFormData = new FormData();
+    const user = gapi.auth2.getAuthInstance().currentUser.get();
+    const oauthToken = user.getAuthResponse().access_token;
+    for (let i = 0; i < newFiles.length; i++) {
+      uploadFormData.append(`file${i}`, acceptedFiles[i]);
+    }
+    xmlHttpRequest.addEventListener('load', (event) => {
+      console.log('Stuff loaded', event);
+    });
+
+    xmlHttpRequest.addEventListener('error', (event) => {
+      console.log('Something went wrong', event);
+    });
+
+    xmlHttpRequest.open('POST', '/api/audio', true);
+    xmlHttpRequest.setRequestHeader('Authorization', `Bearer ${oauthToken}`);
+    xmlHttpRequest.send(uploadFormData);
+
     const { files } = this.state;
 
     this.setState({
@@ -125,7 +165,7 @@ export default class App extends Component {
 
   setSelected = (newSelected) => {
     this.setState({ currentSelected: newSelected });
-    console.log('set new thingy');
+    console.log('Selected', newSelected);
   };
 
   render() {
@@ -137,7 +177,10 @@ export default class App extends Component {
     return (
       <div>
         <Column flexGrow={1}>
-          <Row horizontal="center">Title bar</Row>
+          <Row horizontal="center">
+            Title bar
+            <div className="g-signin2" data-onsuccess="onSignIn" />
+          </Row>
           <Row>
             <Column flexGrow={1}>
               <Row>

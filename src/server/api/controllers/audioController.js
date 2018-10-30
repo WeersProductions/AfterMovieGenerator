@@ -37,14 +37,6 @@ let groupSize = 0;
 const slideshowDuration = 3;
 
 exports.get_song_from_database = async function getSongFromDatabase(songId) {
-  // Song.findById(songId, (err, song) => {
-  //   if (err) {
-  //     onFound(err);
-  //   } else {
-  //     onFound(song);
-  //   }
-  // });
-
   const { rows } = await db.query('SELECT * FROM song WHERE id = $1', [songId]);
 
   return rows[0];
@@ -52,27 +44,17 @@ exports.get_song_from_database = async function getSongFromDatabase(songId) {
 
 exports.get_song_waveform = async function getSongWaveform(req, res) {
   const song = await this.get_song_from_database(req.params.songId);
-
+  console.log('song', song);
   res.writeHead(200, { 'Content-Type': 'image/png' });
   res.end(
-    createPNG(song.totalMax, song.peaks, song.interestingPoints, song.duration, song.beats),
+    createPNG(song.total_max, song.peaks, song.interesting_points, song.duration, song.beats),
     'binary'
   );
-
-  // Song.findById(req.params.songId, (err, song) => {
-  //   if (err) {
-  //     res.send(err);
-  //   }
-  //   res.writeHead(200, { 'Content-Type': 'image/png' });
-  //   res.end(
-  //     createPNG(song.totalMax, song.peaks, song.interestingPoints, song.duration, song.beats),
-  //     'binary'
-  //   );
-  // });
 };
 
 exports.get_song = function getSong(req, res) {
-  exports.get_song_from_database(req.params.songId, (song) => {
+  // TODO: use await
+  this.get_song_from_database(req.params.songId, (song) => {
     res.send({
       name: song.name,
       bpm: song.bpm,
@@ -91,19 +73,23 @@ exports.read_audio = function readAudio(req, res) {
   const form = new IncomingForm();
 
   form.keepExtensions = true;
-  form.parse(req, (err, fields, files) => {
+  form.parse(req, async (err, fields, files) => {
     if (err) {
+      console.log(err);
       res.send(err);
-    } else if (!files.file) {
+    } else if (!files.file0) {
+      console.log('No file received', files);
       res.send('No file received');
     } else {
-      const { file } = files;
+      // Hot fix because we don't support multiple files upload
+      const file = files.file0;
+      console.log(file);
 
       file.buffer = fs.readFileSync(file.path);
-      const songId = createSongData(file.name, file, req.profile);
+      const songId = await createSongData(file.name, file, req.profile);
 
       // Return the new instance, with the id.
-      res.send(songId);
+      res.send({ songId });
 
       // Uncomment this to automatically analyze the song.
       bpmControler.getBPM(file.buffer, (bpmData) => {
@@ -116,7 +102,8 @@ exports.read_audio = function readAudio(req, res) {
 };
 
 exports.reanalyze_audio = function reanalyzeAudio(req, res) {
-  exports.get_song_from_database(req.params.songId, (songData) => {
+  this.get_song_from_database(req.params.songId, (songData) => {
+    console.log('songdata', songData);
     const filePath = `${os.tmpdir() + parseInt(Math.random() * 1000000, 10)}.mp3`;
     // fs.writeFileSync(filePath, songData.rawSong);
     deepAnalyzeSong(
@@ -188,10 +175,15 @@ function deepAnalyzeSong(filePath, bpmData, songId, onFinished) {
           storePeak(duration, bpmData.beats);
         }
 
-        updateSongData(songId, 'interestingPoints', interestingPoints);
-        updateSongData(songId, 'peaks', peaks);
-        updateSongData(songId, 'totalMax', totalMax);
-        updateSongData(songId, 'duration', duration);
+        // updateSongData(songId, 'interesting_points', interestingPoints);
+        // updateSongData(songId, 'peaks', peaks);
+        // updateSongData(songId, 'total_max', totalMax);
+        // updateSongData(songId, 'duration', duration);
+
+        db.query(
+          'UPDATE song SET interesting_points = $2, peaks = $3, total_max = $4, duration = $5 WHERE song_id=$1;',
+          [songId, interestingPoints, peaks, totalMax, duration]
+        );
 
         if (onFinished) {
           onFinished();
@@ -203,9 +195,11 @@ function deepAnalyzeSong(filePath, bpmData, songId, onFinished) {
 
 async function createSongData(name, file, owner) {
   const { rows } = await db.query(
-    'with new_file as (insert into file (datatype) values ($1) returning file_id)  insert into song (file_id) values ((select file_id from new_file))',
+    'with new_file as (insert into file (data_type) values ($1) returning file_id)  insert into song (file_id) values ((select file_id from new_file)) RETURNING song_id',
     [file.type]
   );
+
+  console.log('createSongData', rows);
 
   FileHosting.sendFileToGCS(
     file,
@@ -213,7 +207,7 @@ async function createSongData(name, file, owner) {
       if (uploadErr) {
         console.log(uploadErr);
       }
-      console.log(file);
+      console.log('uploadedFile', file);
       updateFileData(rows[0].song_id, 'src', file.cloudStoragePublicUrl);
     },
     owner
@@ -222,11 +216,11 @@ async function createSongData(name, file, owner) {
 }
 
 async function updateSongData(id, key, value) {
-  const { rows } = await db.query('UPDATE song SET $1 = $2 WHERE song_id=$3', [key, value, id]);
+  const { rows } = await db.query(`UPDATE song SET ${key} = $1 WHERE song_id=$2;`, [value, id]);
 }
 
 async function updateFileData(id, key, value) {
-  const { rows } = await db.query('UPDATE file SET $1 = $2 WHERE file_id=$3', [key, value, id]);
+  const { rows } = await db.query(`UPDATE file SET ${key} = $1 WHERE file_id=$2;`, [value, id]);
 }
 
 function storePeak(duration, beats) {

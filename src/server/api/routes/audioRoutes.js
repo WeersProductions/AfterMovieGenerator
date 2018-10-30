@@ -2,7 +2,7 @@ const audioController = require('../controllers/audioController');
 const oauth2 = require('../lib/oauth2');
 
 module.exports = function audioRoute(app) {
-  app.route('/api/audio').post(audioController.read_audio);
+  app.route('/api/audio').post(oauth2.required, audioController.read_audio);
   // .post(audioController.add_audio);
 
   app.route('/api/waveform/:songId.png').get(audioController.get_song_waveform);

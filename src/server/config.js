@@ -42,7 +42,7 @@ nconf
 
     SECRET: 'keyboardcat',
 
-    DATABASE_URL: 'postgresql://localhost:27017',
+    // DATABASE_URL: 'postgresql://localhost:27017',
     DATABASE_NAME: 'aftermovie'
   });
 
@@ -51,7 +51,7 @@ checkConfig('GCLOUD_PROJECT');
 checkConfig('CLOUD_BUCKET');
 checkConfig('OAUTH2_CLIENT_ID');
 checkConfig('OAUTH2_CLIENT_SECRET');
-checkConfig('DATABASE_URL');
+// checkConfig('DATABASE_URL');
 
 if (nconf.get('DATA_BACKEND') === 'postgresql') {
   checkConfig('SQL_USER');
